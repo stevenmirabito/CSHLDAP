@@ -121,7 +121,17 @@ class CSHLDAP:
 
         filterstr =''
         for key, value in kwargs.iteritems():
-            filterstr += '({0}={1})'.format(key,value)
+            if isinstance(value, list):
+                filterstr += '(|'
+                for term in value:
+                    term = term.replace('(', '\\(')
+                    term = term.replace(')', '\\)')
+                    filterstr += '({0}={1})'.format(key, term)
+                filterstr += ')'
+            else:
+                value = value.replace('(', '\\(')
+                value = value.replace(')', '\\)')
+                filterstr += '({0}={1})'.format(key, value)
             if key == 'dn':
                 filterstr = '(objectClass=*)'
                 base = value
